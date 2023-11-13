@@ -1,33 +1,54 @@
-import openai
+import openai as ai
+import time
+import sys
 
-# Set your OpenAI GPT-3 API key
-api_key = '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'
-openai.api_key = api_key
 
-def generate_response(prompt):
-    # Specify the engine (text-davinci-003 is recommended for GPT-3.5)
-    engine = "text-davinci-003"
+#1
+# # Set your OpenAI GPT-3 API key
+# api_key = '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'
+# ai.api_key = api_key  # Set the API key
 
-    # Set the parameters for the completion
-    response = openai.Completion.create(
-        engine=engine,
-        prompt=prompt,
-        max_tokens=150,
-        temperature=0.7,
-        n=1,
+# # User input
+# user_message = "Write 2 sentences about dogs"
+# print(f"User: {user_message}")
+
+# # Initial message
+# messages = [{"role": "user", "content": user_message}]
+# print(f"Sending initial message to GPT-3: {messages}")
+
+# # Make API call
+# complete = ai.ChatCompletion.create(
+#     model="gpt-3.5-turbo",
+#     messages=messages
+# )
+
+# # Simulate typing and print the content of the completed message
+# response_content = complete.choices[0].message['content']
+# print("GPT-3 is typing: ", end="", flush=True)
+# time.sleep(1)  # Initial delay
+# for char in response_content:
+#     print(char, end="", flush=True)
+#     time.sleep(0.05)  # Adjust the delay to control typing speed
+# print()  # Move to the next line after completion
+
+#2
+ai.api_key = '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'
+messages = []
+
+systemMSG = input("What type of chatbot would you like to create?\n")
+messages.append({"role": "system", "content": systemMSG})
+
+print("Your assistant is ready")
+
+while input != "quit()":
+    message = input("")
+    if message == "quit":
+        sys.exit(1)
+    messages.append({"role": "user", "content": message})
+    response = ai.ChatCompletion.create(
+        model = "gpt-3.5-turbo",
+        messages = messages
     )
-
-    # Extract and return the generated text
-    return response['choices'][0]['text']
-
-# Example usage
-user_input = input("You: ")
-
-while user_input.lower() != 'exit':
-    # You can customize the prompt based on your application needs
-    prompt = f"You: {user_input}\nBot:"
-    response = generate_response(prompt)
-    
-    print(f"Bot: {response}")
-
-    user_input = input("You: ")
+    reply = response["choices"][0]["message"]["content"]
+    messages.append({"role": "user", "content": reply})
+    print("\n" + reply + "\n")
