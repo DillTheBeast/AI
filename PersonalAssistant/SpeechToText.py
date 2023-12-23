@@ -1,46 +1,50 @@
 import speech_recognition as sr
-import keyboard
+from pynput import keyboard as kb
+import threading
+import time
 
-# Initialize the recognizer 
-r = sr.Recognizer() 
+# Initialize the recognizer
+r = sr.Recognizer()
 
 # Initialize variables
 recording = False
 text_buffer = []
 
-# Use the microphone as the source for input
-with sr.Microphone() as source:
-    r.adjust_for_ambient_noise(source, duration=0.2)
+def on_key_release(key):
+    global recording, text_buffer
+    if key == kb.Key.space:
+        recording = not recording
+        if recording:
+            print("Recording started.")
+        else:
+            print("Recording stopped. Text:", " ".join(text_buffer))
+            text_buffer = []
 
-print("Press space to start/stop recording.")
+# Listener for space key
+listener = kb.Listener(on_release=on_key_release)
+listener.start()
 
-while True:
-    try:
-        # Listen for the user's input 
-        with sr.Microphone() as source2:
-            audio2 = r.listen(source2)
-
-        # Use Google to recognize audio
-        MyText = r.recognize_google(audio2)
-        MyText = MyText.lower()
+try:
+    print("Press space to start/stop recording.")
+    while True:
+        with sr.Microphone() as source:
+            r.adjust_for_ambient_noise(source, duration=0.2)
+            audio = r.listen(source)
 
         if recording:
+            MyText = r.recognize_google(audio).lower()
             text_buffer.append(MyText)
             print("Recording:", MyText)
-        
-        # Check if spacebar is pressed to toggle recording
-        if keyboard.is_pressed("space"):
-            recording = not recording
-            if recording:
-                print("Recording started.")
-            else:
-                print("Recording stopped. Text:", " ".join(text_buffer))
-                text_buffer = []
 
-    except KeyboardInterrupt:
-        print("\nExiting the program.")
-        break
-    except sr.RequestError as e:
-        print("Could not request results; {0}".format(e))
-    except sr.UnknownValueError:
-        print("Unknown error occurred")
+except KeyboardInterrupt:
+    print("\nExiting the program.")
+except sr.RequestError as e:
+    print("Could not request results; {0}".format(e))
+except sr.UnknownValueError:
+    print("Speech Recognition could not understand audio")
+except Exception as e:
+    print("An error occurred: {0}".format(e))
+
+finally:
+    listener.stop()
+    listener.join()
