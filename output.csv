@@ -1,0 +1,113 @@
+Title,Link
+Name,
+Row vector,
+Column vector,
+Square matrix,
+Horizontal shearwith m = 1.25.,https://en.wikipedia.org/wiki/Reflection_(mathematics)
+"[
+
+
+
+1
+
+
+1.25
+
+
+
+
+0
+
+
+1
+
+
+
+]
+
+
+
+
+{\displaystyle {\begin{bmatrix}1&1.25\\0&1\end{bmatrix}}}",
+,https://en.wikipedia.org/wiki/File:Flip_map.svg
+Name,
+Diagonal matrix,
+Lower triangular matrix,
+Upper triangular matrix,
+Positive definite matrix,https://en.wikipedia.org/wiki/Indefinite_matrix
+"[
+
+
+
+
+
+1
+4
+
+
+
+
+0
+
+
+
+
+0
+
+
+1
+
+
+
+]
+
+
+
+
+{\displaystyle {\begin{bmatrix}{\frac {1}{4}}&0\\0&1\\\end{bmatrix}}}",
+"Q
+(
+x
+,
+y
+)
+=
+
+
+1
+4
+
+
+
+x
+
+2
+
+
++
+
+y
+
+2
+
+
+
+
+{\displaystyle Q(x,y)={\frac {1}{4}}x^{2}+y^{2}}",
+"Points such that 
+
+
+
+Q
+(
+x
+,
+y
+)
+=
+1
+
+
+{\textstyle Q(x,y)=1}
+
+  (Ellipse).",https://en.wikipedia.org/wiki/File:Hyperbola2_SVG.svg
