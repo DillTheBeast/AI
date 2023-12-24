@@ -1,50 +1,48 @@
 import speech_recognition as sr
-from pynput import keyboard as kb
-import threading
-import time
+from gtts import gTTS
+import os
+import keyboard
+import pygame
+import sys
 
 # Initialize the recognizer
 r = sr.Recognizer()
 
-# Initialize variables
-recording = False
-text_buffer = []
+# Flag to indicate whether recording is active
+recording_active = False
 
-def on_key_release(key):
-    global recording, text_buffer
-    if key == kb.Key.space:
-        recording = not recording
-        if recording:
-            print("Recording started.")
-        else:
-            print("Recording stopped. Text:", " ".join(text_buffer))
-            text_buffer = []
+# Function to toggle recording state
+def toggle_recording():
+    global recording_active
+    recording_active = not recording_active
 
-# Listener for space key
-listener = kb.Listener(on_release=on_key_release)
-listener.start()
+# Loop infinitely for the user to speak
+while True:
+    # Check for space key press to toggle recording state
+    if keyboard.is_pressed('space'):
+        toggle_recording()
+        while keyboard.is_pressed('space'):
+            pass  # Wait for the space key to be released to avoid multiple toggles
 
-try:
-    print("Press space to start/stop recording.")
-    while True:
-        with sr.Microphone() as source:
-            r.adjust_for_ambient_noise(source, duration=0.2)
-            audio = r.listen(source)
+    # Check for escape key press to exit the program
+    if keyboard.is_pressed('esc'):
+        sys.exit()
 
-        if recording:
-            MyText = r.recognize_google(audio).lower()
-            text_buffer.append(MyText)
-            print("Recording:", MyText)
+    # If recording is active, listen for user's input
+    if recording_active:
+        try:
+            with sr.Microphone() as source:
+                r.adjust_for_ambient_noise(source, duration=0.2)
+                audio = r.listen(source)
 
-except KeyboardInterrupt:
-    print("\nExiting the program.")
-except sr.RequestError as e:
-    print("Could not request results; {0}".format(e))
-except sr.UnknownValueError:
-    print("Speech Recognition could not understand audio")
-except Exception as e:
-    print("An error occurred: {0}".format(e))
+                # Using Google to recognize audio
+                my_text = r.recognize_google(audio)
+                my_text = my_text.lower()
 
-finally:
-    listener.stop()
-    listener.join()
+                print("Recording:", my_text)
+
+        except sr.RequestError as e:
+            print("Could not request results; {0}".format(e))
+
+        except sr.UnknownValueError:
+            print("Unknown error occurred")
