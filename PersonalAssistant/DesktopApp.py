@@ -17,19 +17,14 @@ screen.fill(background_color)
 
 # Define colors
 white = (255, 255, 255)
-red = (255, 0, 0)
+black = (0, 0, 0)
+type = black
 
 # Draw a white microphone
-white_mic_surface = pygame.Surface((100, 50), pygame.SRCALPHA)
-pygame.draw.rect(white_mic_surface, (0, 0, 0, 0), (0, 0, 100, 50))  # Set alpha to 0 for full transparency
-pygame.draw.circle(white_mic_surface, white, (25, 25), 20, 2)  # Set alpha to 255 for full opacity
-pygame.draw.rect(white_mic_surface, white, (50, 15, 15, 20))  # Set alpha to 255 for full opacity
-
-# Draw a red microphone
-red_mic_surface = pygame.Surface((100, 50), pygame.SRCALPHA)
-pygame.draw.rect(red_mic_surface, (255, 0, 0, 0), (0, 0, 100, 50))  # Set alpha to 0 for full transparency
-pygame.draw.circle(red_mic_surface, red, (25, 25), 20)  # Set alpha to 255 for full opacity
-pygame.draw.rect(red_mic_surface, red, (50, 15, 15, 20))  # Set alpha to 255 for full opacity
+mic_surface = pygame.Surface((100, 50), pygame.SRCALPHA)
+pygame.draw.rect(mic_surface, (0, 0, 0, 0), (50, 5, 20, 40))
+pygame.draw.circle(mic_surface, black, (25, 25), 20, 2)
+pygame.draw.rect(mic_surface, black, (15, 35, 20, 40))
 
 # Render text on top of the background
 font = pygame.font.Font(None, 36)
@@ -38,20 +33,22 @@ text_rect = text_surface.get_rect(center=(WIDTH // 2, 20))
 screen.blit(text_surface, text_rect)
 
 # Create a button with the white microphone image
-button_rect_white = pygame.Rect((WIDTH // 2 - 50, HEIGHT // 2 - 25, 100, 50))
-button_white_mic = Button(button_rect_white, white_mic_surface, (30, 30, 30), (60, 60, 60), lambda: toggle_mic_color([True]))
+button_rect_white = pygame.Rect((WIDTH // 2 - 25, HEIGHT // 2 - 50, 50, 100))
+button_white_mic = Button(button_rect_white, mic_surface, (30, 30, 30), (60, 60, 60), lambda: toggle_mic_color())
 # Initialize mic color toggle variable
-mic_color_white = [True]
+mic_color_white = True
 
-def toggle_mic_color(mic_color):
-    mic_color[0] = not mic_color[0]
-    if mic_color[0]:
-        button_white_mic.set_image(white_mic_surface)
-        set_background_color((255, 255, 255))  # Set background to white
+def toggle_mic_color():
+    global mic_color_white
+    mic_color_white = not mic_color_white
+    if mic_color_white:
+        type = black
     else:
-        button_white_mic.set_image(red_mic_surface)
-        set_background_color((0, 0, 0))  # Set background to black
-
+        type = white
+    
+    pygame.draw.rect(mic_surface, (0, 0, 0, 0), (50, 5, 20, 40))
+    pygame.draw.circle(mic_surface, type, (25, 25), 20, 2)
+    pygame.draw.rect(mic_surface, type, (25, 5, 20, 40))
 
 def set_background_color(color):
     global background_color
@@ -81,8 +78,8 @@ while running:
     # Draw the button
     button_white_mic.draw(screen, font)
 
-    # Update the display
-    pygame.display.flip()
+    # Update only the region of the screen where the button is located
+    pygame.display.update(button_white_mic.rect)
 
 # Quit pygame
 pygame.quit()
