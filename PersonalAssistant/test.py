@@ -1,84 +1,85 @@
-import speech_recognition as sr
-from gtts import gTTS
-import os
-import keyboard
-import pygame
-import sys
+# import sys module 
+import pygame 
+import sys 
+# pygame.init() will initialize all 
+# imported module 
+pygame.init() 
 
-# Define recording_active and inputText as global variables
-recording_active = False
-inputText = ""
+clock = pygame.time.Clock() 
 
-# Initialize the Pygame mixer
-pygame.mixer.init()
+# it will display on screen 
+screen = pygame.display.set_mode([600, 500]) 
 
-def TextToSpeech(text):
-    # Language in which you want to convert
-    language = 'en'
+# basic font for user typed 
+base_font = pygame.font.Font(None, 32) 
+user_text = '' 
 
-    # Create a gTTS object
-    myobj = gTTS(text=text, lang=language, slow=False)
+# create rectangle 
+input_rect = pygame.Rect(200, 200, 140, 32) 
 
-    # Saving the converted audio in an mp3 file named welcome
-    myobj.save("audio1.mp3")
+# color_active stores color(lightskyblue3) which 
+# gets active when input box is clicked by user 
+color_active = pygame.Color('lightskyblue3') 
 
-    # Load the audio file
-    pygame.mixer.music.load("audio1.mp3")
+# color_passive store color(chartreuse4) which is 
+# color of input box. 
+color_passive = pygame.Color('chartreuse4') 
+color = color_passive 
 
-    # Play the audio
-    pygame.mixer.music.play()
+active = False
 
-    # Wait for the audio to finish playing
-    pygame.time.wait(5000)  # Adjust the wait time as needed
+while True: 
+	for event in pygame.event.get(): 
 
-def toggle_recording():
-    global recording_active
-    recording_active = not recording_active
+	# if user types QUIT then the screen will close 
+		if event.type == pygame.QUIT: 
+			pygame.quit() 
+			sys.exit() 
 
-def SpeechToText():
-    # Initialize the recognizer
-    r = sr.Recognizer()
+		if event.type == pygame.MOUSEBUTTONDOWN: 
+			if input_rect.collidepoint(event.pos): 
+				active = True
+			else: 
+				active = False
 
-    # Use the global keyword to indicate that we want to modify the global variable
-    global recording_active
-    global inputText
+		if event.type == pygame.KEYDOWN: 
 
-    # Loop infinitely for the user to speak
-    while True:
-        # Check for space key press to toggle recording state
-        if keyboard.is_pressed('space'):
-            toggle_recording()
-            while keyboard.is_pressed('space'):
-                pass  # Wait for the space key to be released to avoid multiple toggles
+			# Check for backspace 
+			if event.key == pygame.K_BACKSPACE: 
 
-        # Check for escape key press to exit the program
-        if keyboard.is_pressed('esc'):
-            sys.exit()
+				# get text input from 0 to -1 i.e. end. 
+				user_text = user_text[:-1] 
 
-        # If recording is active, listen for user's input
-        if recording_active:
-            try:
-                with sr.Microphone() as source:
-                    r.adjust_for_ambient_noise(source, duration=0.2)
-                    audio = r.listen(source)
+			# Unicode standard is used for string 
+			# formation 
+			else: 
+				user_text += event.unicode
+	
+	# it will set background color of screen 
+	screen.fill((255, 255, 255)) 
 
-                    # Using Google to recognize audio
-                    inputText = r.recognize_google(audio)
-                    inputText = inputText.lower()
+	if active: 
+		color = color_active 
+	else: 
+		color = color_passive 
+		
+	# draw rectangle and argument passed which should 
+	# be on screen 
+	pygame.draw.rect(screen, color, input_rect) 
 
-                    print("Recording:", inputText)
-
-                    # Call TextToSpeech immediately after recognition
-                    TextToSpeech(inputText)
-
-                    # Break out of the loop after recognition
-                    break
-
-            except sr.RequestError as e:
-                print("Could not request results; {0}".format(e))
-
-            except sr.UnknownValueError:
-                print("Unknown error occurred")
-
-# Call the functions for testing
-SpeechToText()
+	text_surface = base_font.render(user_text, True, (255, 255, 255)) 
+	
+	# render at position stated in arguments 
+	screen.blit(text_surface, (input_rect.x+5, input_rect.y+5)) 
+	
+	# set width of textfield so that text cannot get 
+	# outside of user's text input 
+	input_rect.w = max(100, text_surface.get_width()+10) 
+	
+	# display.flip() will update only a portion of the 
+	# screen to updated, not full area 
+	pygame.display.flip() 
+	
+	# clock.tick(60) means that for every second at most 
+	# 60 frames should be passed. 
+	clock.tick(60) 

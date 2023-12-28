@@ -29,6 +29,7 @@ class Button:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
                 self.clicked = not self.clicked
+                print("CLICKED")
                 self.callback()
 
     def set_image(self, image_surface):
