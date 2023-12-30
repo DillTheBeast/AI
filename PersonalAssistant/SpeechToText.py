@@ -1,8 +1,6 @@
 import speech_recognition as sr
 from gtts import gTTS
-import os
 import keyboard
-import pygame
 import sys
 
 # Initialize the recognizer

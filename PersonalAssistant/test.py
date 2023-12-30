@@ -10,7 +10,7 @@ def main():
     window = sg.Window("Personal Assistant", layout, size=(800, 600), background_color='gray')
 
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
 
         if event == sg.WINDOW_CLOSED:
             break
@@ -18,6 +18,9 @@ def main():
             recording = not recording
             if recording:
                 window['microphone_button'].update(button_color=('lightgray', 'red'))
+                currentText = values['input_text']
+                newText = currentText + 'test\n'
+                window['input_text'].update(value=newText)
             else:
                 window['microphone_button'].update(button_color=('red', 'lightgray'))
 
