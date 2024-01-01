@@ -51,6 +51,7 @@ def record_audio(window):
             if answer:
                 # Use PySimpleGUI's update method for threaded updates
                 window['input_text'].update(value=answer[0].upper() + ''.join([answer[i] for i in range(1, len(answer))]) + ". ", append=True)
+
 def main():
     global recording_active
     recording_active = False
@@ -58,7 +59,9 @@ def main():
 
     layout = [
         [sg.Text("Welcome to your personal Assistant", text_color='white', background_color='gray', justification='center', font=('Helvetica', 16), key='welcome_text', expand_x=True)],
-        [sg.Multiline('', size=(50, 6), key='input_text', font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.2), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)],
+        [sg.Multiline('', size=(50, 4), key='input_text', font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.2), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)],
+        [sg.Button("Equalize Test Boxes", size=(15, 1.2), font=('Helvetica', 20), key='equalize_button', button_color=('darkgray', 'white'), expand_x=True, enable_events=True)],
+        [sg.Multiline('', key='input_box', size = (20, 2),font=('Helvetica', 20), expand_x=True)]
     ]
 
     window = sg.Window("Personal Assistant", layout, size=(800, 600), background_color='gray')
@@ -81,6 +84,13 @@ def main():
         elif event == 'update_text':
             # Event received from the recording thread, update the text in the GUI
             window['input_text'].update(value=values[event], append=True)
+
+        elif event == 'refresh_button':
+            # Add functionality for the refresh button if needed
+            pass
+
+        elif event == 'equalize_button':
+            window.close()
 
     window.close()
 
