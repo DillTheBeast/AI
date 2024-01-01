@@ -49,8 +49,8 @@ def record_audio(window):
             save_to_mp3(audio_data)
             answer = speech_to_text(audio)
             if answer:
-                window.write_event_value('update_text', answer[0].upper() + ''.join([answer[i] for i in range(1, len(answer))]) + ". ")
-
+                # Use PySimpleGUI's update method for threaded updates
+                window['input_text'].update(value=answer[0].upper() + ''.join([answer[i] for i in range(1, len(answer))]) + ". ", append=True)
 def main():
     global recording_active
     recording_active = False
