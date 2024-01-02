@@ -4,6 +4,7 @@ import audioop
 import wave
 from pydub import AudioSegment
 import threading
+import os
 
 # Initialize the recognizer and the microphone
 r = sr.Recognizer()
@@ -68,7 +69,7 @@ def main():
         [sg.Text("Welcome to your personal Assistant", text_color='white', background_color='gray', justification='center', font=('Helvetica', 16), key='welcome_text', expand_x=True)],
         [sg.Multiline('', size=(50, 4), key='speech_text', font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.4), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)],
         [sg.Button("Make both Top", size=(15, 1.2), font=('Helvetica', 20), key='top_button', button_color=('darkgray', 'white'), expand_x=True, enable_events=True), sg.Button("Make both Bottom", size=(15, 1.2), font=('Helvetica', 20), key='bottom_button', button_color=('white', 'darkgray'), expand_x=True, enable_events=True)],
-        [sg.Multiline('', key='typed_text', size=(50, 4), font=('Helvetica', 20)), sg.Button("🗣️", size=(20, 1.4), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)]
+        [sg.Multiline('', key='typed_text', size=(50, 4), font=('Helvetica', 20)), sg.Button("🗣️", size=(20, 1.4), font=('Helvetica', 20), key='speak_button', button_color=('black', 'lightgray'), enable_events=True)]
     ]
 
     window = sg.Window("Personal Assistant", layout, size=(800, 600), background_color='gray')
@@ -85,9 +86,8 @@ def main():
             # Event received from the recording thread, update the text in the GUI
             window['speech_text'].update(value=values[event], append=True)
 
-        elif event == 'refresh_button':
-            # Add functionality for the refresh button if needed
-            pass
+        elif event == 'speak_button':
+            os.system(f'say "{values["typed_text"]}"')
 
         elif event == 'top_button':
             # Retrieve everything from the bottom + top textbox
