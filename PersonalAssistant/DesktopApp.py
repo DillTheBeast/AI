@@ -68,7 +68,7 @@ def main():
         [sg.Text("Welcome to your personal Assistant", text_color='white', background_color='gray', justification='center', font=('Helvetica', 16), key='welcome_text', expand_x=True)],
         [sg.Multiline('', size=(50, 4), key='speech_text', font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.4), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)],
         [sg.Button("Make both Top", size=(15, 1.2), font=('Helvetica', 20), key='top_button', button_color=('darkgray', 'white'), expand_x=True, enable_events=True), sg.Button("Make both Bottom", size=(15, 1.2), font=('Helvetica', 20), key='bottom_button', button_color=('white', 'darkgray'), expand_x=True, enable_events=True)],
-        [sg.Multiline('', key='typed_text', size=(50, 2), font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.2), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)]
+        [sg.Multiline('', key='typed_text', size=(50, 4), font=('Helvetica', 20)), sg.Button("🗣️", size=(20, 1.4), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)]
     ]
 
     window = sg.Window("Personal Assistant", layout, size=(800, 600), background_color='gray')
