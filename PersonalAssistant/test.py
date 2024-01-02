@@ -1,19 +1,12 @@
 import PySimpleGUI as sg
 import speech_recognition as sr
-import audioop
-import wave
-from pydub import AudioSegment
 import threading
+import queue
+import pyaudio
+from pydub import AudioSegment
 
-# Initialize the recognizer and the microphone
+# Initialize the recognizer
 r = sr.Recognizer()
-with sr.Microphone() as source:
-    r.adjust_for_ambient_noise(source, duration=0.2)
-
-# Function to toggle recording state
-def toggle_recording():
-    global recording_active
-    recording_active = not recording_active
 
 def speech_to_text(audio):
     try:
@@ -28,59 +21,71 @@ def speech_to_text(audio):
         print("Unknown error occurred")
         return None
 
-def save_to_mp3(audio_data, filename='audio.mp3'):
-    wav_filename = 'audio.wav'
-    with wave.open(wav_filename, 'wb') as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(44100)
-        wf.writeframes(audio_data)
+# Initialize the recognizer
+r = sr.Recognizer()
 
-    sound = AudioSegment.from_wav(wav_filename)
-    sound.export(filename, format="mp3")
-    return filename
+def record_audio(q, stop_event):
+    CHUNK = 1024
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+    RECORD_SECONDS = 0.5  # Adjust the recording duration as needed
 
-def record_audio(window):
-    global recording_active
-    while recording_active:
-        with sr.Microphone() as source:
-            audio = r.listen(source)
-            audio_data = audioop.tomono(audio.get_raw_data(), audio.sample_width, 0.5, 0.5)  # Convert stereo to mono
-            save_to_mp3(audio_data)
-            answer = speech_to_text(audio)
-            if answer:
-                # Use PySimpleGUI's update method for threaded updates
-                window['input_text'].update(value=answer[0].upper() + ''.join([answer[i] for i in range(1, len(answer))]) + ". ", append=True)
+    p = pyaudio.PyAudio()
+    stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
+
+    while not stop_event.is_set():
+        try:
+            data = stream.read(int(RATE / CHUNK * RECORD_SECONDS))
+            q.put(data)
+        except Exception as e:
+            print(f"Error in recording thread: {e}")
+            break
+
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
 def main():
-    global recording_active
     recording_active = False
-    recorded_text_list = []
+    q = queue.Queue()
+    stop_event = threading.Event()
 
     layout = [
         [sg.Text("Welcome to your personal Assistant", text_color='white', background_color='gray', justification='center', font=('Helvetica', 16), key='welcome_text', expand_x=True)],
-        [sg.Multiline('', size=(50, 6), key='input_text', font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.2), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)],
+        [sg.Multiline('', size=(50, 4), key='speech_text', font=('Helvetica', 20))],
+        [sg.Button("🎤", size=(20, 1.2), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray')),
+         sg.Button("Make both Top", size=(15, 1.2), font=('Helvetica', 20), key='top_button', button_color=('darkgray', 'white'), expand_x=True),
+         sg.Button("Make both Bottom", size=(15, 1.2), font=('Helvetica', 20), key='bottom_button', button_color=('white', 'darkgray'), expand_x=True)],
+        [sg.Multiline('', key='typed_text', size=(50, 2), font=('Helvetica', 20))],
     ]
 
     window = sg.Window("Personal Assistant", layout, size=(800, 600), background_color='gray')
 
+    recording_thread = threading.Thread(target=record_audio, args=(q, stop_event), daemon=True)
+    recording_thread.start()
+
     while True:
-        event, values = window.read(timeout=500)  # Reduced the update frequency to 500 milliseconds
+        event, values = window.read(timeout=500)
 
         if event == sg.WINDOW_CLOSED:
+            stop_event.set()  # Stop the recording thread before closing
             break
         elif event == 'microphone_button':
-            toggle_recording()
-            if recording_active:
-                window['microphone_button'].update(button_color=('lightgray', 'red'))
-                # Start a new thread for recording
-                recording_thread = threading.Thread(target=record_audio, args=(window,), daemon=True)
-                recording_thread.start()
-            else:
-                window['microphone_button'].update(button_color=('red', 'lightgray'))
-
-        elif event == 'update_text':
-            # Event received from the recording thread, update the text in the GUI
-            window['input_text'].update(value=values[event], append=True)
+            recording_active = not recording_active
+            window['microphone_button'].update(button_color=('lightgray', 'red') if recording_active else ('red', 'lightgray'))
+        elif event == 'top_button':
+            window['typed_text'].update(value=values['speech_text'])
+        elif event == 'bottom_button':
+            window['speech_text'].update(value=values['typed_text'])
+        elif event == sg.TIMEOUT_EVENT and recording_active:
+            try:
+                audio_data = b''.join(q.queue)
+                answer = speech_to_text(sr.AudioData(audio_data, 44100, 2))
+                if answer:
+                    window['speech_text'].update(value=answer[0].upper() + ''.join([answer[i] for i in range(1, len(answer))]) + ". ", append=True)
+            except Exception as e:
+                print(f"Error in updating text: {e}")
 
     window.close()
 

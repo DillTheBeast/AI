@@ -11,9 +11,17 @@ with sr.Microphone() as source:
     r.adjust_for_ambient_noise(source, duration=0.2)
 
 # Function to toggle recording state
-def toggle_recording():
+def toggle_recording(window):
     global recording_active
     recording_active = not recording_active
+
+    if recording_active:
+        window['microphone_button'].update(button_color=('lightgray', 'red'))
+        # Start a new thread for recording
+        recording_thread = threading.Thread(target=record_audio, args=(window,), daemon=True)
+        recording_thread.start()
+    else:
+        window['microphone_button'].update(button_color=('red', 'lightgray'))
 
 def speech_to_text(audio):
     try:
@@ -49,19 +57,18 @@ def record_audio(window):
             save_to_mp3(audio_data)
             answer = speech_to_text(audio)
             if answer:
-                # Use PySimpleGUI's update method for threaded updates
-                window['input_text'].update(value=answer[0].upper() + ''.join([answer[i] for i in range(1, len(answer))]) + ". ", append=True)
+                # Use PySimpleGUI's write_event_value to trigger the 'update_text' event in the main thread
+                window.write_event_value('update_text', answer[0].upper() + ''.join([answer[i] for i in range(1, len(answer))]) + ". ")
 
 def main():
     global recording_active
     recording_active = False
-    recorded_text_list = []
 
     layout = [
         [sg.Text("Welcome to your personal Assistant", text_color='white', background_color='gray', justification='center', font=('Helvetica', 16), key='welcome_text', expand_x=True)],
-        [sg.Multiline('', size=(50, 4), key='input_text', font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.2), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)],
-        [sg.Button("Equalize Test Boxes", size=(15, 1.2), font=('Helvetica', 20), key='equalize_button', button_color=('darkgray', 'white'), expand_x=True, enable_events=True)],
-        [sg.Multiline('', key='input_box', size = (20, 2),font=('Helvetica', 20), expand_x=True)]
+        [sg.Multiline('', size=(50, 4), key='speech_text', font=('Helvetica', 20)), sg.Button("🎤", size=(20, 1.2), font=('Helvetica', 20), key='microphone_button', button_color=('black', 'lightgray'), enable_events=True)],
+        [sg.Button("Make both Top", size=(15, 1.2), font=('Helvetica', 20), key='top_button', button_color=('darkgray', 'white'), expand_x=True, enable_events=True), sg.Button("Make both Bottom", size=(15, 1.2), font=('Helvetica', 20), key='bottom_button', button_color=('white', 'darkgray'), expand_x=True, enable_events=True)],
+        [sg.Multiline('', key='typed_text', size=(20, 2), font=('Helvetica', 20), expand_x=True)]
     ]
 
     window = sg.Window("Personal Assistant", layout, size=(800, 600), background_color='gray')
@@ -72,25 +79,23 @@ def main():
         if event == sg.WINDOW_CLOSED:
             break
         elif event == 'microphone_button':
-            toggle_recording()
-            if recording_active:
-                window['microphone_button'].update(button_color=('lightgray', 'red'))
-                # Start a new thread for recording
-                recording_thread = threading.Thread(target=record_audio, args=(window,), daemon=True)
-                recording_thread.start()
-            else:
-                window['microphone_button'].update(button_color=('red', 'lightgray'))
+            toggle_recording(window)
 
         elif event == 'update_text':
             # Event received from the recording thread, update the text in the GUI
-            window['input_text'].update(value=values[event], append=True)
+            window['speech_text'].update(value=values[event], append=True)
 
         elif event == 'refresh_button':
             # Add functionality for the refresh button if needed
             pass
 
-        elif event == 'equalize_button':
-            window.close()
+        elif event == 'top_button':
+            # Retrieve everything from the bottom + top textbox
+            window['typed_text'].update(value=values['speech_text'])
+
+        elif event == 'bottom_button':
+            # Retrieve everything from the bottom + top textbox
+            window['speech_text'].update(value=values['typed_text'])
 
     window.close()
 
