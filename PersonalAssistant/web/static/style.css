@@ -7,19 +7,24 @@ body {
     background-size: cover;
     background-position: center;
     height: 100vh;
-    color: #fff;
+    color: #000; /* Change the text color to black */
 }
 
 #content {
     text-align: center;
-    margin-top: 20vh;
+    margin-top: 0; /* Set margin-top to 0 to place the content at the top */
 }
 
 h1, p {
     margin: 10px 0;
+    color: #000; /* Change the text color to black */
 }
 
-button {
+form {
+    margin-top: 20px;
+}
+
+input[type="submit"] {
     padding: 10px;
     font-size: 16px;
     cursor: pointer;
@@ -29,6 +34,6 @@ button {
     border-radius: 5px;
 }
 
-button:hover {
+input[type="submit"]:hover {
     background-color: #2980b9;
 }
