@@ -9,7 +9,9 @@ from torch.utils.data import DataLoader
 class SimpleNN(nn.Module):
     def __init__(self):
         super(SimpleNN, self).__init__()
+        # Input to hidden layer
         self.fc1 = nn.Linear(28 * 28, 128)
+        # Hidden layer to output
         self.fc2 = nn.Linear(128, 10)
 
     def forward(self, x):
@@ -43,6 +45,8 @@ def train_model(model, train_loader, num_epochs=5):
     
     for epoch in range(num_epochs):
         running_loss = 0.0
+        correct = 0
+        total = 0
         for images, labels in train_loader:
             optimizer.zero_grad()
             outputs = model(images)
@@ -50,8 +54,16 @@ def train_model(model, train_loader, num_epochs=5):
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
+            
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
         
-        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}')
+        accuracy = 100 * correct / total
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}, Accuracy: {accuracy:.2f}%')
+    
+    # Save the trained model's state dictionary
+    torch.save(model.state_dict(), 'model.pth')
 
 def test_model(model, test_loader):
     correct = 0
@@ -66,3 +78,10 @@ def test_model(model, test_loader):
     accuracy = 100 * correct / total
     print(f'Accuracy of the model on the 10000 test images: {accuracy}%')
     return accuracy
+
+def load_model(model_path='model.pth'):
+    model = SimpleNN()
+    state_dict = torch.load(model_path)
+    model.load_state_dict(state_dict)
+    model.eval()  # Set the model to evaluation mode
+    return model
