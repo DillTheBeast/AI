@@ -6,7 +6,7 @@ from tkinter import filedialog, messagebox
 import customtkinter as ctk
 from PIL import Image, ImageOps
 import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
 
 # Load the data
 train_loader, test_loader = load_data()
