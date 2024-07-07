@@ -1,0 +1,11 @@
+Need to know fundamentals of
+    Calc
+    Linear Algebra
+    Probability Theory
+
+Need to understand
+    What the derivative of a function is + how to conpute it
+    What a matrix is
+    How the dot product works
+
+Can find most of this on Khan Academy
