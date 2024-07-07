@@ -9,25 +9,19 @@ from torch.utils.data import DataLoader
 class SimpleNN(nn.Module):
     def __init__(self):
         super(SimpleNN, self).__init__()
-        self.fc1 = nn.Linear(28 * 28, 256)
-        self.dropout1 = nn.Dropout(0.5)
-        self.fc2 = nn.Linear(256, 128)
-        self.dropout2 = nn.Dropout(0.5)
-        self.fc3 = nn.Linear(128, 10)
-    
+        # Input to hidden layer
+        self.fc1 = nn.Linear(28 * 28, 128)
+        # Hidden layer to output
+        self.fc2 = nn.Linear(128, 10)
+
     def forward(self, x):
         x = x.view(-1, 28 * 28)
         x = torch.relu(self.fc1(x))
-        x = self.dropout1(x)
-        x = torch.relu(self.fc2(x))
-        x = self.dropout2(x)
-        x = self.fc3(x)
+        x = self.fc2(x)
         return x
 
 def load_data(batch_size=64):
     transform = transforms.Compose([
-        transforms.RandomRotation(10),
-        transforms.RandomAffine(0, translate=(0.1, 0.1)),
         transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5,))
     ])
@@ -37,10 +31,7 @@ def load_data(batch_size=64):
     )
     
     test_dataset = torchvision.datasets.MNIST(
-        root='./data', train=False, download=True, transform=transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.5,), (0.5,))
-        ])
+        root='./data', train=False, download=True, transform=transform
     )
     
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
@@ -50,7 +41,7 @@ def load_data(batch_size=64):
 
 def train_model(model, train_loader, num_epochs=5):
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     
     for epoch in range(num_epochs):
         running_loss = 0.0
@@ -71,6 +62,7 @@ def train_model(model, train_loader, num_epochs=5):
         accuracy = 100 * correct / total
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}, Accuracy: {accuracy:.2f}%')
     
+    # Save the trained model's state dictionary
     torch.save(model.state_dict(), 'model.pth')
 
 def test_model(model, test_loader):

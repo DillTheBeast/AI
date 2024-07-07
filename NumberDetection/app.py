@@ -35,12 +35,15 @@ def uploadPhoto():
         filetypes=[("PNG Files", "*.png"), ("JPEG Files", "*.jpg"), ("JPEG Files", "*.jpeg"), ("GIF Files", "*.gif"), ("BMP Files", "*.bmp")]
     )
     if file_path:
-        # Process the image and predict
-        predicted_digit = process_and_predict(file_path)
-        messagebox.showinfo("Information", f"Selected file: {file_path}\nPredicted Digit: {predicted_digit}")
+        try:
+            predicted_digit = process_and_predict(file_path)
+            messagebox.showinfo("Information", f"Selected file: {file_path}\nPredicted Digit: {predicted_digit}")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
     else:
         messagebox.showwarning("Warning", "No file selected")
 
+# Add a progress bar or loading indicator if needed
 def process_and_predict(image_path):
     # Load the image
     image = Image.open(image_path)
@@ -54,9 +57,6 @@ def process_and_predict(image_path):
     # Resize the image to 28x28
     image = image.resize((28, 28))
     
-    # Thresholding
-    image = image.point(lambda p: p > 128 and 255)
-    
     # Normalize the image
     transform = transforms.Compose([
         transforms.ToTensor(),
@@ -67,15 +67,19 @@ def process_and_predict(image_path):
     image = transform(image).unsqueeze(0)  # Add batch dimension
     
     # Visualize the processed image (optional)
-    plt.imshow(image.squeeze().numpy(), cmap='gray')
-    plt.title("Resized and Normalized Image")
-    plt.show()
+    # plt.imshow(image.squeeze().numpy(), cmap='gray')
+    # plt.title("Resized and Normalized Image")
+    # plt.show()
     
     # Predict the digit
     model.eval()  # Set the model to evaluation mode
     with torch.no_grad():
         output = model(image)
         _, predicted = torch.max(output.data, 1)
+        
+        # Get confidence scores
+        # confidence_scores = torch.nn.functional.softmax(output, dim=1).squeeze()
+        # print(f"Confidence scores: {confidence_scores}")
     
     return predicted.item()
 
