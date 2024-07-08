@@ -9,3 +9,9 @@ Need to understand
     How the dot product works
 
 Can find most of this on Khan Academy
+Andrej Karpathy Neural Network Series (DEF DO)
+Andrew Ng Course (Might be payed)
+Deep Learning Specialization (Course)
+Hugging Face Course
+
+Kaggle Challenges
