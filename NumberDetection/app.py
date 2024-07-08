@@ -22,7 +22,7 @@ def TrainOrTest():
         # Initialize the model
         model = SimpleNN()
         # Train the model
-        train_model(model, train_loader, num_epochs=5)
+        train_model(model, train_loader, num_epochs=25)
         print("Trained a new model and saved it to disk.")
     return model
 
@@ -32,7 +32,13 @@ model = TrainOrTest()
 def uploadPhoto():
     file_path = filedialog.askopenfilename(
         title="Select a Photo",
-        filetypes=[("PNG Files", "*.png"), ("JPEG Files", "*.jpg"), ("JPEG Files", "*.jpeg"), ("GIF Files", "*.gif"), ("BMP Files", "*.bmp")]
+        filetypes=[
+            ("All Image Files", "*.png;*.jpg;*.jpeg;*.gif;*.bmp"),
+            ("PNG Files", "*.png"),
+            ("JPEG Files", "*.jpg;*.jpeg"),
+            ("GIF Files", "*.gif"),
+            ("BMP Files", "*.bmp")
+        ]
     )
     if file_path:
         try:
