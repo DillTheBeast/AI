@@ -1,0 +1,92 @@
+https://www.youtube.com/watch?v=aircAruvnKk
+https://www.youtube.com/watch?v=IHZwWFHWa-w&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi&index=2
+
+STRUCTURE OF NEURAL NETWORKS
+
+Going to use 4 layers with the 28 x 28 image
+    Input layer = 784 neurons
+    Hidden layer 1 = 16 neurons
+    Hidden layer 2 = 16 neurons
+    Output layer = 10 neurons (0-9)
+
+Change the image to 28 x 28 pixels so the image is 784 total pixels
+    Each pixel = 1 Neuron
+    Each pixel goes from 0.00 to 1.00 for black to white
+All 784 Neurons = first layer of network
+Last layer = 10 Neurons
+    1 Digit = 1 Neuron
+    Activation from 0.00 to 1.00 = how likely the given image is that number
+Layers in between input and output = hidden layers
+
+Activation in previous layer = activation in next layer
+Brightness of each pixel = input layer
+
+9 = o on top + l on bottom
+8 = o on top + o on bottom
+4 = l + l on top left + _ on top middle
+
+Hope is that 3rd layer will be lit up with that combination of something like
+o on top + l on bottom so that it puts those together and makes the 9 in the output layer
+
+But then an o can be placed by the edges like ( + _ + '
+Second layer will be lit up with the broken down edges
+
+Neural Networks learn by adjusting the weights of each connection from one neuron to another
+    Weights = numbers
+Take all of the activation from the previous layer and compute their weighted sum
+Now pump the weighted sum into a function that squeezes it in between 0 and 1
+    Sigmoid function = o(x) = 1/(1 + e^-x)
+Each neuron is just how positive the weighted sum is
+Then add bias
+
+Weights tell us the pixel pattern being picked up in the next layer
+Bias tells you how high the weighted sum needs to be before the neuron is meaningfully active
+
+Every neuron in second layer gets connected from all 784 pixels in the input layer
+
+Total weights = 784 x 16 + 16 x 16 + 16 x 10 = 12960
+Total biases = 16 + 16 + 10 = 42
+Total things to be adjusted = 12960 + 42 = 13002
+
+Learning means getting the computer to find the right weights and biases
+
+Each neuron is like a function because different inputs cause different outputs
+
+
+
+Each neuron is connected to all of the neurons in the previous layer
+The weights defining the activation are the strengths of those connections
+Bias is an indication whether the nueron is active or not
+
+Start by initializing the weights and biases randomly
+The network will then perform pretty horribly
+Then define a cost function
+    This is a way of telling the computer that the network is bad
+    You should have activations for 0 for most neurons and 1 for the correct one
+Do this mathemically by:
+    Adding up the squares of the differences between the trash activations and
+    the activation you want
+    This is the cost of a single training example
+The output is small when the computer correctly and confidentally identifies
+the right number and big when the network does not know what it is doing
+
+Now take the average cost of all the training examples
+The average cost is the measure for how bad the network is and should feel
+
+Neural Network Function:
+    Input: 784 Numbers (Pixels)
+    Output: 10 Numbers
+    Parameters: 13002 weights/biases
+
+Cost Function:
+    Input: 13002 weights/biases
+    Ouput: 1 Number (the cost)
+    Parameters: The many training examples
+
+Way to find how to adjust the weight is find the slope of the function
+You want to try and get as close to the minimum as possible
+    If slope is positive then go left (closer to minimum)
+    If slope is negative then go right (closer to minimum)
+    Keep adjusting until you hit the local minimum
+If the function has multiple places where the graph drops then
+you might not end up at the correct minimum

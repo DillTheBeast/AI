@@ -5,7 +5,7 @@ Need to know fundamentals of
 
 Need to understand
     What the derivative of a function is + how to conpute it
-    What a matrix is
+    What a matrix is  
     How the dot product works
 
 Can find most of this on Khan Academy
