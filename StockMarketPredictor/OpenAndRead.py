@@ -41,23 +41,10 @@ def open_text_file():
         model.fit(X_train, y_train)
         
         # Making predictions on the test set
-        y_pred = model.predict(X_test)
-        
-        # Calculate metrics
-        mse = mean_squared_error(y_test, y_pred)
-        r2 = r2_score(y_test, y_pred)
-        
-        # Displaying results
-        results = (
-            f"Coefficients: {model.coef_}\n"
-            f"Intercept: {model.intercept_}\n"
-            f"Mean Squared Error: {mse}\n"
-            f"R2 Score: {r2}\n\n"
-            f"Predictions on Test Data:\n{pd.DataFrame({'Actual': y_test, 'Predicted': y_pred}).to_string(index=False)}"
-        )
-        
-        # Insert results into text widget
-        text.insert(tk.END, results)
+        future_date = datetime.strptime('2027-02-01', '%Y-%m-%d').timestamp()
+        y_pred = model.predict([[future_date]])  # Reshaped into a 2D array
+
+        text.insert(tk.END, f"Predicted result for 2027-02-01 is: {y_pred[0]}\n")
 
 
 # Button to open file and trigger the regression
@@ -70,3 +57,6 @@ open_button = ttk.Button(
 open_button.grid(column=0, row=1, padx=10, pady=10)
 
 root.mainloop()
+
+
+#OUTPUT: Predicted result for 2027-02-01 is: 81.74350209844226

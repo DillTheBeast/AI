@@ -1,0 +1,10 @@
+Road name = String
+Speed limit = int
+Direction of road = String
+Stop sign = boolean
+Stop light = boolean
+Amount of cars = int
+Road Address = String
+Zip Code = int (Length = 5)
+Landmark names = String
+State = String
