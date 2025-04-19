@@ -1,0 +1,89 @@
+This is a test case for the AI.
+
+A First Course in Linear Algebra is an introductory textbook aimed at college-level sophomores and juniors. Typically students will have taken calculus, but it is not a prerequisite. The book begins with systems of linear equations, then covers matrix algebra, before taking up finite-dimensional vector spaces in full generality. The final chapter covers matrix representations of linear transformations, through diagonalization, change of basis and Jordan canonical form. Determinants and eigenvalues are covered along the way.
+
+A unique feature of this book is that chapters, sections and theorems are labeled rather than numbered. For example, the chapter on vectors is labeled "Chapter V" and the theorem that elementary matrices are nonsingular is labeled "Theorem EMN."
+
+Another feature of this book is that it is designed to integrate SAGE, an open source alternative to mathematics software such as Matlab and Maple. The author includes a 45-minute video tutorial on SAGE and teaching linear algebra.
+
+This textbook has been used in classes at: Centre for Excellence in Basic Sciences, Westmont College, University of Ottawa, Plymouth State University, University of Puget Sound, University of Notre Dame, Carleton University, Amherst College, Felician College, Southern Connecticut State University, Michigan Technological University, Mount Saint Mary College, University of Western Australia, Moorpark College, Pacific University, Colorado State University, Smith College, Wilbur Wright College, Central Washington U (Lynwood Center), St. Cloud State University, Miramar College, Loyola Marymount University.
+
+About the Contributors
+Author
+Robert A. Beezer is a Professor of Mathematics at the University of Puget Sound, where he has been on the faculty since 1984. He received a B.S. in Mathematics from the University of Santa Clara in 1978, a M.S. in Statistics from the University of Illinois at Urbana-Champaign in 1982 and a Ph.D. in Mathematics from the University of Illinois at Urbana-Champaign in 1984. He teaches calculus, linear algebra and abstract algebra regularly, while his research interests include the applications of linear algebra to graph theory.
+
+Table of Contents
+I Fundamentals
+
+1. Sets
+2. Logic
+3. Counting
+II How to Prove Conditional Statements
+
+4. Direct Proof
+5. Contrapositive Proof
+6. Proof by Contradiction
+III More on Proof
+
+7. Proving Non-Conditional Statements
+8. Proofs Involving Sets
+9. Disproof
+10. Mathematical Induction
+IV Relations, Functions and Cardinality
+
+11. Relations
+12. Functions
+13. Proofs in Calculus
+14. Cardinality of Sets
+Ancillary Material
+Richard Hammack
+About the Book
+This is a book about how to prove theorems.
+
+Until this point in your education, you may have regarded mathematics primarily as a computational discipline. You have learned to solve equations, compute derivatives and integrals, multiply matrices and find determinants; and you have seen how these things can answer practical questions about the real world. In this setting, your primary goal in using mathematics has been to compute answers.
+
+But there is another approach to mathematics that is more theoretical than computational. In this approach, the primary goal is to understand mathematical structures, to prove mathematical statements, and even to invent or discover new mathematical theorems and theories. The mathematical techniques and procedures that you have learned and used up until now have their origins in this theoretical side of mathematics. For example, in computing the area under a curve, you use the fundamental theorem of calculus. It is because this theorem is true that your answer is correct. However, in your calculus class you were probably far more concerned with how that theorem could be applied than in understanding why it is true. But how do we know it is true? How can we convince ourselves or others of its validity? Questions of this nature belong to the theoretical realm of mathematics. This book is an introduction to that realm.
+
+This book will initiate you into an esoteric world. You will learn and apply the methods of thought that mathematicians use to verify theorems,explore mathematical truth and create new mathematical theories. This will prepare you for advanced mathematics courses, for you will be better able to understand proofs, write your own proofs and think critically and inquisitively about mathematics.
+
+This text has been used in classes at: Virginia Commonwealth University, Lebanon Valley College, University of California - San Diego, Colorado State University, Westminster College, South Dakota State University, PTEK College - Brunei, Christian Brothers High School, University of Texas Pan American, Schola Europaea, James Madison University, Heriot-Watt University, Prince of Songkla University, Queen Mary University of London, University of Nevada - Reno, University of Georgia - Athens, Saint Peter's University, California State University,Bogaziçi University, Pennsylvania State University, University of Notre Dame
+
+About the Contributors
+Author
+Richard Hammack, PhD is an Associate Professor in the Department of Mathematics and Applied Mathematics at Virginia Commonwealth University. He received his PhD in mathematics from the University of North Carolina at Chapel Hill.
+
+Contribute to this Page
+Suggest an edit to this book record
+
+Table of Contents
+Preface
+Chapter 0: Highlights of Calculus
+Chapter 1: Introduction to Calculus
+Chapter 2: Derivatives
+Chapter 3: Applications of the Derivative
+Chapter 4: Derivatives by the Chain Rule
+Chapter 5: Integrals
+Chapter 6: Exponentials and Logarithms
+Chapter 7: Techniques of Integration
+Chapter 8: Applications of the Integral
+Chapter 9: Polar Coordinates and Complex Numbers
+Chapter 10: Infinite Series
+Chapter 11: Vectors and Matrices
+Chapter 12: Motion along a Curve
+Chapter 13: Partial Derivatives
+Chapter 14: Multiple Integrals
+Chapter 15: Vector Calculus
+Chapter 16: Mathematics after Calculus
+Ancillary Material
+Video Lectures
+About the Book
+Published in 1991 by Wellesley-Cambridge Press, the book is a useful resource for educators and self-learners alike. It is well organized, covers single variable and multivariable calculus in depth, and is rich with applications.
+
+Prof. Strang has also developed a related series of videos, Highlights of Calculus, on the basic ideas of calculus.
+
+About the Contributors
+Author
+Gilbert Strang was an undergraduate at MIT and a Rhodes Scholar at Balliol College, Oxford. His Ph.D. was from UCLA and since then he has taught at MIT. He has been a Sloan Fellow and a Fairchild Scholar and is a Fellow of the American Academy of Arts and Sciences. He is a Professor of Mathematics at MIT and an Honorary Fellow of Balliol College. Professor Strang has published eight textbooks. He was the President of SIAM during 1999 and 2000, and Chair of the Joint Policy Board for Mathematics. He received the von Neumann Medal of the US Association for Computational Mechanics, and the Henrici Prize for applied analysis. The first Su Buchin Prize from the International Congress of Industrial and Applied Mathematics, and the Haimo Prize from the Mathematical Association of America, were awarded for his contributions to teaching around the world.
+
+Contribute to this Page
+Suggest an edit to this book record
