@@ -1,4 +1,4 @@
-# simple_melcnn.py
+# main.py
 
 import os
 import glob
@@ -14,17 +14,17 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# ────────────────────────────────────
+ 
 # 0) Fix random seed
-# ────────────────────────────────────
+ 
 SEED = 42
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
 
-# ────────────────────────────────────
+ 
 # 1) Collect files & labels
-# ────────────────────────────────────
+ 
 ROOT = os.path.join(os.path.dirname(__file__), "all_wavs")
 files = sorted(glob.glob(os.path.join(ROOT, "*.wav")))
 assert files, "No .wav files found in all_wavs/"
@@ -39,7 +39,6 @@ LABELS     = sorted(set(labels_str))
 lab2idx    = {l:i for i,l in enumerate(LABELS)}
 labels     = [lab2idx[l] for l in labels_str]
 
-# stratified 80/20 split
 train_files, test_files, y_train, y_test = train_test_split(
     files, labels,
     test_size   = 0.2,
@@ -47,9 +46,9 @@ train_files, test_files, y_train, y_test = train_test_split(
     stratify    = labels
 )
 
-# ────────────────────────────────────
+ 
 # 2) Mel-spectrogram transform
-# ────────────────────────────────────
+ 
 SR         = 16000
 MAX_SEC    = 4.0
 MAX_SAMPS  = int(SR * MAX_SEC)
@@ -61,9 +60,9 @@ mel_transform = nn.Sequential(
     torchaudio.transforms.AmplitudeToDB()
 )
 
-# ────────────────────────────────────
+ 
 # 3) Dataset
-# ────────────────────────────────────
+ 
 class RAVDESSDataset(Dataset):
     def __init__(self, files, labels):
         self.files  = files
@@ -74,8 +73,8 @@ class RAVDESSDataset(Dataset):
 
     def __getitem__(self, idx):
         f = self.files[idx]
-        wav, sr = torchaudio.load(f)          # [channels, time]
-        wav = wav.mean(0, keepdim=True)       # to mono
+        wav, sr = torchaudio.load(f)
+        wav = wav.mean(0, keepdim=True)       # mono
         if sr != SR:
             wav = torchaudio.functional.resample(wav, sr, SR)
         # pad or trim
@@ -87,21 +86,15 @@ class RAVDESSDataset(Dataset):
         spec = (spec - spec.mean()) / (spec.std() + 1e-6)
         return spec, self.labels[idx]
 
-train_ds = RAVDESSDataset(train_files, y_train)
-test_ds  = RAVDESSDataset(test_files,  y_test)
-
-train_loader = DataLoader(train_ds, batch_size=32, shuffle=True,  num_workers=2)
-test_loader  = DataLoader(test_ds,  batch_size=32, shuffle=False, num_workers=2)
-
-# ────────────────────────────────────
-# 4) Simple 2‑layer CNN
-# ────────────────────────────────────
+ 
+# 4) Model
+ 
 class SimpleCNN(nn.Module):
     def __init__(self, n_classes=len(LABELS)):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Conv2d(1,32,3,padding=1), nn.ReLU(), nn.MaxPool2d(2),
-            nn.Conv2d(32,64,3,padding=1), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(1, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
             nn.Flatten(),
             nn.Linear(64*(64//4)*(int(MAX_SAMPS/160)//4), 128),
             nn.ReLU(), nn.Dropout(0.3),
@@ -111,59 +104,68 @@ class SimpleCNN(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model  = SimpleCNN().to(device)
-opt    = optim.Adam(model.parameters(), lr=1e-3)
-loss_fn= nn.CrossEntropyLoss()
+ 
+# 5) Train and evaluate — wrapped in main
+ 
+def train_model():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model  = SimpleCNN().to(device)
+    opt    = optim.Adam(model.parameters(), lr=1e-3)
+    loss_fn = nn.CrossEntropyLoss()
 
-# ────────────────────────────────────
-# 5) Train & evaluate
-# ────────────────────────────────────
-for epoch in range(1, 51):
-    # train
-    model.train()
-    total_loss = 0
-    for X,y in train_loader:
-        X,y = X.to(device), y.to(device)
-        opt.zero_grad()
-        logits = model(X)
-        loss   = loss_fn(logits, y)
-        loss.backward()
-        opt.step()
-        total_loss += loss.item()*X.size(0)
-    train_loss = total_loss/len(train_ds)
+    train_ds = RAVDESSDataset(train_files, y_train)
+    test_ds  = RAVDESSDataset(test_files,  y_test)
 
-    # eval
+    train_loader = DataLoader(train_ds, batch_size=32, shuffle=True,  num_workers=0)
+    test_loader  = DataLoader(test_ds,  batch_size=32, shuffle=False, num_workers=0)
+
+    for epoch in range(1, 51):
+        model.train()
+        total_loss = 0
+        for X, y in train_loader:
+            X, y = X.to(device), y.to(device)
+            opt.zero_grad()
+            logits = model(X)
+            loss = loss_fn(logits, y)
+            loss.backward()
+            opt.step()
+            total_loss += loss.item() * X.size(0)
+        train_loss = total_loss / len(train_ds)
+
+        model.eval()
+        correct = 0
+        with torch.no_grad():
+            for X, y in test_loader:
+                X, y = X.to(device), y.to(device)
+                preds = model(X).argmax(1)
+                correct += (preds == y).sum().item()
+        acc = correct / len(test_ds)
+        print(f"Epoch {epoch:02d} | Train Loss {train_loss:.3f} | Val Acc {acc:.3f}")
+
+    # Final classification report
+    y_true, y_pred = [], []
     model.eval()
-    correct = 0
     with torch.no_grad():
-        for X,y in test_loader:
-            X,y = X.to(device), y.to(device)
-            preds = model(X).argmax(1)
-            correct += (preds==y).sum().item()
-    acc = correct/len(test_ds)
-    print(f"Epoch {epoch:02d} | Train Loss {train_loss:.3f} | Val Acc {acc:.3f}")
+        for X, y in test_loader:
+            X = X.to(device)
+            preds = model(X).argmax(1).cpu().tolist()
+            y_pred.extend(preds)
+            y_true.extend(y.tolist())
 
-# ────────────────────────────────────
-# 6) Final report & confusion matrix
-# ────────────────────────────────────
-model.eval()
-y_true, y_pred = [], []
-with torch.no_grad():
-    for X,y in test_loader:
-        X = X.to(device)
-        preds = model(X).argmax(1).cpu().tolist()
-        y_pred.extend(preds)
-        y_true.extend(y.tolist())
+    print(classification_report(y_true, y_pred, target_names=LABELS))
 
-print(classification_report(y_true, y_pred, target_names=LABELS))
+    cm = confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(6, 5))
+    plt.imshow(cm, cmap="Blues", interpolation="nearest")
+    plt.colorbar()
+    plt.xticks(range(len(LABELS)), LABELS, rotation=45, ha="right")
+    plt.yticks(range(len(LABELS)), LABELS)
+    plt.tight_layout()
+    plt.savefig("confusion_matrix.png")
+    print("Saved confusion matrix to confusion_matrix.png")
 
-cm = confusion_matrix(y_true, y_pred)
-plt.figure(figsize=(6,5))
-plt.imshow(cm, cmap="Blues", interpolation="nearest")
-plt.colorbar()
-plt.xticks(range(len(LABELS)), LABELS, rotation=45, ha="right")
-plt.yticks(range(len(LABELS)), LABELS)
-plt.tight_layout()
-plt.savefig("confusion_matrix.png")
-print("Saved confusion matrix to confusion_matrix.png")
+ 
+# 6) Entry point
+ 
+if __name__ == "__main__":
+    train_model()
